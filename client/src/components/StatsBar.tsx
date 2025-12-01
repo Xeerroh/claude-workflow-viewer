@@ -4,11 +4,16 @@ import type { ConversationNode } from '@workflow-viewer/shared';
 import './StatsBar.css';
 
 export function StatsBar() {
-  const { nodes } = useStore();
+  const { nodes, filterType, setFilterType } = useStore();
 
   const stats = useMemo(() => computeStats(nodes), [nodes]);
 
   if (nodes.length === 0) return null;
+
+  const handleFilterClick = (filter: string | null) => {
+    // Toggle filter off if clicking the same one
+    setFilterType(filterType === filter ? null : filter);
+  };
 
   return (
     <div className="stats-bar">
@@ -18,26 +23,42 @@ export function StatsBar() {
         <span className="stat-label">Duration</span>
       </div>
 
-      <div className="stat-item">
+      <div
+        className={`stat-item clickable ${filterType === 'user' ? 'active' : ''}`}
+        onClick={() => handleFilterClick('user')}
+        title="Filter to user messages"
+      >
         <span className="stat-icon">💬</span>
         <span className="stat-value">{stats.turns}</span>
         <span className="stat-label">Turns</span>
       </div>
 
-      <div className="stat-item">
+      <div
+        className={`stat-item clickable ${filterType === 'tool_call' ? 'active' : ''}`}
+        onClick={() => handleFilterClick('tool_call')}
+        title="Filter to tool calls"
+      >
         <span className="stat-icon">🔧</span>
         <span className="stat-value">{stats.toolCalls}</span>
         <span className="stat-label">Tools</span>
       </div>
 
-      <div className="stat-item">
+      <div
+        className={`stat-item clickable ${filterType === 'agent' ? 'active' : ''}`}
+        onClick={() => handleFilterClick('agent')}
+        title="Filter to agents"
+      >
         <span className="stat-icon">🚀</span>
         <span className="stat-value">{stats.agents}</span>
         <span className="stat-label">Agents</span>
       </div>
 
       {stats.errors > 0 && (
-        <div className="stat-item stat-error" onClick={() => scrollToFirstError()}>
+        <div
+          className={`stat-item stat-error clickable ${filterType === 'errors' ? 'active' : ''}`}
+          onClick={() => handleFilterClick('errors')}
+          title="Filter to errors"
+        >
           <span className="stat-icon">⚠</span>
           <span className="stat-value">{stats.errors}</span>
           <span className="stat-label">Errors</span>
@@ -128,9 +149,3 @@ function formatDuration(ms: number): string {
   return `${seconds}s`;
 }
 
-function scrollToFirstError() {
-  const errorNode = document.querySelector('.tree-status.error');
-  if (errorNode) {
-    errorNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-}

@@ -256,6 +256,15 @@ function formatTime(timestamp: string): string {
   });
 }
 
+function isErrorNode(node: ConversationNode): boolean {
+  if (node.toolResult?.stderr) return true;
+  if (node.type === 'tool_result' && typeof node.content === 'string') {
+    const content = node.content.toLowerCase();
+    return content.includes('error') || content.includes('failed');
+  }
+  return false;
+}
+
 function filterNodes(
   nodes: ConversationNode[],
   filterType: string | null,
@@ -268,8 +277,14 @@ function filterNodes(
       return false;
     }
 
+    // Special "errors" filter
+    if (filterType === 'errors') {
+      const nodeIsError = isErrorNode(node);
+      const childrenMatch = node.children && filterNodes(node.children, filterType, searchQuery, showSystem).length > 0;
+      if (!nodeIsError && !childrenMatch) return false;
+    }
     // Type filter
-    if (filterType && node.type !== filterType) {
+    else if (filterType && node.type !== filterType) {
       // Check if any children match
       const childrenMatch = node.children && filterNodes(node.children, filterType, searchQuery, showSystem).length > 0;
       if (!childrenMatch) return false;

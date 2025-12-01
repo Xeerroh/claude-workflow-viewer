@@ -6,8 +6,12 @@ const NODE_TYPES = [
   { value: 'user', label: 'User' },
   { value: 'assistant', label: 'Assistant' },
   { value: 'thinking', label: 'Thinking' },
-  { value: 'tool_call', label: 'Tool Calls' },
+  { value: 'tool_call', label: 'Tools' },
   { value: 'tool_result', label: 'Results' },
+  { value: 'agent', label: 'Agents' },
+  { value: 'skill', label: 'Skills' },
+  { value: 'command', label: 'Commands' },
+  { value: 'errors', label: 'Errors' },
 ];
 
 export function Toolbar() {

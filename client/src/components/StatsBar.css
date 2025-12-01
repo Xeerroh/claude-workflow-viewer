@@ -67,3 +67,30 @@
 .stat-item.stat-success .stat-icon {
   color: #22c55e;
 }
+
+/* Clickable stats */
+.stat-item.clickable {
+  cursor: pointer;
+}
+
+.stat-item.clickable:hover {
+  border-color: var(--accent-blue);
+  background: var(--bg-tertiary);
+}
+
+.stat-item.clickable.active {
+  border-color: var(--accent-blue);
+  background: rgba(59, 130, 246, 0.15);
+  box-shadow: 0 0 0 1px var(--accent-blue);
+}
+
+.stat-item.clickable.active .stat-value {
+  color: var(--accent-blue);
+}
+
+/* Override for error when active */
+.stat-item.stat-error.active {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.2);
+  box-shadow: 0 0 0 1px #ef4444;
+}
