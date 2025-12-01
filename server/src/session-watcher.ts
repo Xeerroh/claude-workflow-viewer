@@ -17,8 +17,8 @@ export class SessionWatcher extends EventEmitter {
   private filePath: string;
   private watcher: FSWatcher | null = null;
   private nodes: Map<string, ConversationNode> = new Map();
-  private lastSize = 0;
-  private buffer = '';
+  private lastLineCount = 0;
+  private processedLines: Set<string> = new Set(); // Track processed line hashes to avoid duplicates
 
   constructor(filePath: string) {
     super();
@@ -49,8 +49,8 @@ export class SessionWatcher extends EventEmitter {
       this.watcher = null;
     }
     this.nodes.clear();
-    this.lastSize = 0;
-    this.buffer = '';
+    this.lastLineCount = 0;
+    this.processedLines.clear();
   }
 
   getNodes(): ConversationNode[] {
@@ -64,13 +64,19 @@ export class SessionWatcher extends EventEmitter {
   private async readFile(): Promise<void> {
     try {
       const content = await readFile(this.filePath, 'utf-8');
-      this.lastSize = (await stat(this.filePath)).size;
-
       const lines = content.split('\n').filter(line => line.trim());
+
       for (const line of lines) {
-        this.processLine(line);
+        if (this.isValidJsonLine(line)) {
+          const lineHash = this.hashLine(line);
+          if (!this.processedLines.has(lineHash)) {
+            this.processedLines.add(lineHash);
+            this.processLine(line);
+          }
+        }
       }
 
+      this.lastLineCount = lines.length;
       this.emit('init', this.buildTree());
     } catch (error) {
       console.error('Error reading file:', error);
@@ -80,30 +86,31 @@ export class SessionWatcher extends EventEmitter {
 
   private async readNewContent(): Promise<void> {
     try {
-      const stats = await stat(this.filePath);
-      if (stats.size <= this.lastSize) {
+      const content = await readFile(this.filePath, 'utf-8');
+      const lines = content.split('\n').filter(line => line.trim());
+
+      // Only process lines beyond what we've already seen
+      if (lines.length <= this.lastLineCount) {
         return;
       }
 
-      const content = await readFile(this.filePath, 'utf-8');
-      const newContent = content.slice(this.lastSize);
-      this.lastSize = stats.size;
-
-      // Handle partial lines
-      this.buffer += newContent;
-      const lines = this.buffer.split('\n');
-
-      // Keep last incomplete line in buffer
-      this.buffer = lines.pop() || '';
-
-      for (const line of lines) {
-        if (line.trim()) {
-          const node = this.processLine(line);
-          if (node) {
-            this.emit('update', node);
+      // Process new lines
+      const newLines = lines.slice(this.lastLineCount);
+      for (const line of newLines) {
+        if (this.isValidJsonLine(line)) {
+          const lineHash = this.hashLine(line);
+          if (!this.processedLines.has(lineHash)) {
+            this.processedLines.add(lineHash);
+            const node = this.processLine(line);
+            if (node) {
+              this.emit('update', node);
+            }
           }
         }
+        // Silently skip invalid lines (partial writes)
       }
+
+      this.lastLineCount = lines.length;
     } catch (error) {
       console.error('Error reading new content:', error);
     }
@@ -600,5 +607,56 @@ export class SessionWatcher extends EventEmitter {
 
     flatten(nodes);
     return result;
+  }
+
+  /**
+   * Check if a line is valid JSON before attempting to parse.
+   * This prevents errors from partial writes.
+   */
+  private isValidJsonLine(line: string): boolean {
+    const trimmed = line.trim();
+    if (!trimmed) return false;
+
+    // Must start with { and end with }
+    if (!trimmed.startsWith('{') || !trimmed.endsWith('}')) {
+      return false;
+    }
+
+    // Try to parse to validate
+    try {
+      JSON.parse(trimmed);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Create a simple hash of a line for deduplication.
+   * Uses the uuid field if present, otherwise a simple hash.
+   */
+  private hashLine(line: string): string {
+    try {
+      const parsed = JSON.parse(line);
+      // Use uuid as hash if available (most reliable)
+      if (parsed.uuid) {
+        return parsed.uuid;
+      }
+      // For file-history-snapshot, use messageId
+      if (parsed.messageId) {
+        return `snapshot-${parsed.messageId}`;
+      }
+    } catch {
+      // Fall through to string hash
+    }
+
+    // Simple string hash as fallback
+    let hash = 0;
+    for (let i = 0; i < line.length; i++) {
+      const char = line.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return `hash-${hash}`;
   }
 }
