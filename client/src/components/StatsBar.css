@@ -1,0 +1,69 @@
+.stats-bar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+  border-bottom: 1px solid var(--border-color);
+  overflow-x: auto;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  transition: all 0.2s;
+}
+
+.stat-item:hover {
+  border-color: var(--accent-blue);
+  transform: translateY(-1px);
+}
+
+.stat-icon {
+  font-size: 1.1rem;
+}
+
+.stat-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+}
+
+.stat-item.stat-error {
+  border-color: rgba(239, 68, 68, 0.5);
+  background: rgba(239, 68, 68, 0.1);
+  cursor: pointer;
+}
+
+.stat-item.stat-error:hover {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.stat-item.stat-error .stat-value {
+  color: #ef4444;
+}
+
+.stat-item.stat-error .stat-icon {
+  color: #ef4444;
+}
+
+.stat-item.stat-success .stat-value {
+  color: #22c55e;
+}
+
+.stat-item.stat-success .stat-icon {
+  color: #22c55e;
+}

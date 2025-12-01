@@ -1,0 +1,316 @@
+.tree-view {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  padding: 16px;
+}
+
+.tree-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--text-secondary);
+}
+
+.tree-empty-hint {
+  font-size: 0.875rem;
+  margin-top: 8px;
+}
+
+.tree-node-container {
+  user-select: none;
+  margin-bottom: 3px;
+}
+
+/* Card-style nodes */
+.tree-node {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.tree-node:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--accent-blue);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.tree-node.selected {
+  background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* User/System nodes - more prominent */
+.tree-node.type-user,
+.tree-node.type-system {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, var(--bg-secondary) 100%);
+  border-left: 4px solid var(--accent-blue);
+}
+
+/* AI response nodes */
+.tree-node.type-assistant {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, var(--bg-secondary) 100%);
+  border-left: 4px solid var(--accent-green);
+}
+
+/* Tool nodes */
+.tree-node.type-tool_call {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.08) 0%, var(--bg-secondary) 100%);
+}
+
+/* Agent nodes */
+.tree-node.type-agent {
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.1) 0%, var(--bg-secondary) 100%);
+  border-left: 4px solid #9333ea;
+}
+
+/* Thinking nodes */
+.tree-node.type-thinking {
+  background: linear-gradient(135deg, rgba(167, 139, 250, 0.08) 0%, var(--bg-secondary) 100%);
+  opacity: 0.85;
+}
+
+/* Result nodes */
+.tree-node.type-tool_result {
+  background: var(--bg-primary);
+  border-style: dashed;
+}
+
+.tree-toggle {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  color: var(--text-secondary);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.tree-toggle:hover {
+  background: var(--accent-blue);
+  color: white;
+  border-color: var(--accent-blue);
+}
+
+.tree-toggle-spacer {
+  width: 20px;
+  flex-shrink: 0;
+}
+
+/* Badge with icon */
+.tree-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.badge-icon {
+  font-size: 0.75rem;
+}
+
+.badge-label {
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.tree-type-badge.type-user {
+  background: var(--accent-blue);
+  color: white;
+}
+
+.tree-type-badge.type-assistant {
+  background: var(--accent-green);
+  color: #1a1a2e;
+}
+
+.tree-type-badge.type-thinking {
+  background: var(--accent-purple);
+  color: white;
+}
+
+.tree-type-badge.type-tool_call {
+  background: var(--accent-orange);
+  color: #1a1a2e;
+}
+
+.tree-type-badge.type-tool_result {
+  background: var(--accent-yellow);
+  color: #1a1a2e;
+}
+
+.tree-type-badge.type-system {
+  background: #666;
+  color: #ddd;
+}
+
+.tree-type-badge.type-agent {
+  background: #9333ea;
+  color: white;
+}
+
+.tree-type-badge.type-skill {
+  background: #0891b2;
+  color: white;
+}
+
+.tree-type-badge.type-command {
+  background: #db2777;
+  color: white;
+}
+
+/* Name badges for specific types */
+.tree-agent-type,
+.tree-skill-name,
+.tree-command-name,
+.tree-tool-name {
+  font-size: 0.7rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.tree-agent-type {
+  color: #a855f7;
+  background: rgba(168, 85, 247, 0.15);
+}
+
+.tree-skill-name {
+  color: #22d3ee;
+  background: rgba(34, 211, 238, 0.15);
+}
+
+.tree-command-name {
+  color: #f472b6;
+  background: rgba(244, 114, 182, 0.15);
+}
+
+.tree-tool-name {
+  color: var(--accent-orange);
+  background: rgba(249, 115, 22, 0.15);
+}
+
+.tree-summary {
+  flex: 1;
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.tree-time {
+  font-size: 0.65rem;
+  font-family: monospace;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  padding: 2px 6px;
+  background: var(--bg-primary);
+  border-radius: 3px;
+}
+
+/* Status indicators */
+.tree-status {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.tree-status.success {
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.15);
+}
+
+.tree-status.error {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+  animation: pulse-error 2s infinite;
+}
+
+@keyframes pulse-error {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Children container */
+.tree-children {
+  margin-left: 24px;
+  padding-left: 16px;
+  border-left: 2px solid var(--border-color);
+  margin-top: 3px;
+}
+
+/* Animation for new nodes */
+@keyframes nodeAppear {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tree-node-container {
+  animation: nodeAppear 0.3s ease-out;
+}
+
+/* Hover effect on children connector */
+.tree-node-container:hover > .tree-children {
+  border-color: var(--accent-blue);
+}
+
+/* Inline preview */
+.tree-inline-preview {
+  margin-left: 44px;
+  margin-top: 3px;
+  margin-bottom: 6px;
+  padding: 8px 10px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 0.7rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 80px;
+  overflow: hidden;
+  position: relative;
+}
+
+.tree-inline-preview::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: linear-gradient(transparent, var(--bg-primary));
+  pointer-events: none;
+}
