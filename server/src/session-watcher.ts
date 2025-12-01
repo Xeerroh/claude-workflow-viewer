@@ -96,6 +96,8 @@ export class SessionWatcher extends EventEmitter {
 
       // Process new lines
       const newLines = lines.slice(this.lastLineCount);
+      let hasNewNodes = false;
+
       for (const line of newLines) {
         if (this.isValidJsonLine(line)) {
           const lineHash = this.hashLine(line);
@@ -103,7 +105,7 @@ export class SessionWatcher extends EventEmitter {
             this.processedLines.add(lineHash);
             const node = this.processLine(line);
             if (node) {
-              this.emit('update', node);
+              hasNewNodes = true;
             }
           }
         }
@@ -111,6 +113,11 @@ export class SessionWatcher extends EventEmitter {
       }
 
       this.lastLineCount = lines.length;
+
+      // Emit the full reorganized tree so nesting is correct
+      if (hasNewNodes) {
+        this.emit('init', this.buildTree());
+      }
     } catch (error) {
       console.error('Error reading new content:', error);
     }

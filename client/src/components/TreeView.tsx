@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, memo } from 'react';
 import { useStore } from '../store';
 import type { ConversationNode } from '@workflow-viewer/shared';
 import './TreeView.css';
@@ -93,8 +93,15 @@ interface TreeNodeProps {
   depth: number;
 }
 
-function TreeNode({ node, depth }: TreeNodeProps) {
-  const { selectedNodeId, setSelectedNodeId, expandedNodeIds, toggleExpanded, filterType, searchQuery, showSystem } = useStore();
+const TreeNode = memo(function TreeNode({ node, depth }: TreeNodeProps) {
+  // Use individual selectors to minimize re-renders
+  const selectedNodeId = useStore(state => state.selectedNodeId);
+  const setSelectedNodeId = useStore(state => state.setSelectedNodeId);
+  const expandedNodeIds = useStore(state => state.expandedNodeIds);
+  const toggleExpanded = useStore(state => state.toggleExpanded);
+  const filterType = useStore(state => state.filterType);
+  const searchQuery = useStore(state => state.searchQuery);
+  const showSystem = useStore(state => state.showSystem);
 
   const isExpanded = expandedNodeIds.has(node.id);
   const isSelected = selectedNodeId === node.id;
@@ -171,7 +178,7 @@ function TreeNode({ node, depth }: TreeNodeProps) {
       )}
     </div>
   );
-}
+});
 
 function getTypeIcon(type: string): string {
   switch (type) {
