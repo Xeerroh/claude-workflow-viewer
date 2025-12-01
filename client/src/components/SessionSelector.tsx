@@ -63,7 +63,7 @@ export function SessionSelector() {
 
     const groups: Record<string, SessionInfo[]> = {};
     for (const session of processedSessions) {
-      const key = getProjectName(session.projectPath);
+      const key = session.projectName || getProjectName(session.projectPath);
       if (!groups[key]) groups[key] = [];
       groups[key].push(session);
     }
@@ -208,6 +208,8 @@ interface SessionItemProps {
 }
 
 function SessionItem({ session, isActive, onClick, compact }: SessionItemProps) {
+  const projectName = session.projectName || getProjectName(session.projectPath);
+
   return (
     <button
       className={`session-item ${isActive ? 'active' : ''} ${session.isLive ? 'live' : ''} ${compact ? 'compact' : ''}`}
@@ -215,7 +217,12 @@ function SessionItem({ session, isActive, onClick, compact }: SessionItemProps) 
     >
       <div className="session-item-header">
         {!compact && (
-          <span className="session-project">{getProjectName(session.projectPath)}</span>
+          <span className="session-project">{projectName}</span>
+        )}
+        {session.gitBranch && (
+          <span className="branch-badge" title={`Branch: ${session.gitBranch}`}>
+            {session.gitBranch}
+          </span>
         )}
         {session.isLive && <span className="live-badge">LIVE</span>}
       </div>

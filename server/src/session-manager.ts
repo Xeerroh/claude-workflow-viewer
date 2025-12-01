@@ -33,7 +33,7 @@ export class SessionManager {
           const fileStat = await stat(filePath);
           const sessionId = file.replace('.jsonl', '');
 
-          // Decode project path
+          // Decode project path (note: hyphens in folder names become spaces, which is imperfect)
           const decodedProjectPath = projectFolder
             .replace(/^C--/, 'C:/')
             .replace(/--/g, '/')
@@ -58,6 +58,7 @@ export class SessionManager {
               sessionId,
               filePath,
               projectPath: decodedProjectPath,
+              projectName: metadata.projectName || decodedProjectPath.split('/').pop() || decodedProjectPath,
               lastModified,
               fileSize: fileStat.size,
               isLive,
@@ -88,6 +89,8 @@ export class SessionManager {
     toolCount: number;
     firstMessage: string;
     duration: number;
+    gitBranch: string;
+    projectName: string;
   }> {
     try {
       const content = await readFile(filePath, 'utf-8');
@@ -98,6 +101,8 @@ export class SessionManager {
       let toolCount = 0;
       let firstTimestamp: number | null = null;
       let lastTimestamp: number | null = null;
+      let gitBranch = '';
+      let projectName = '';
 
       for (const line of lines) {
         try {
@@ -110,6 +115,19 @@ export class SessionManager {
               if (firstTimestamp === null) firstTimestamp = ts;
               lastTimestamp = ts;
             }
+          }
+
+          // Extract git branch (use the most recent non-empty value)
+          if ('gitBranch' in entry && entry.gitBranch) {
+            gitBranch = entry.gitBranch;
+          }
+
+          // Extract project name from cwd (actual path, not encoded)
+          if (!projectName && 'cwd' in entry && entry.cwd) {
+            const cwd = entry.cwd as string;
+            // Get the last folder name from the path
+            const parts = cwd.split(/[/\\]/);
+            projectName = parts[parts.length - 1] || parts[parts.length - 2] || cwd;
           }
 
           if ('type' in entry) {
@@ -156,10 +174,12 @@ export class SessionManager {
         messageCount,
         toolCount,
         firstMessage: firstUserMessage,
-        duration
+        duration,
+        gitBranch,
+        projectName
       };
     } catch (error) {
-      return { messageCount: 0, toolCount: 0, firstMessage: '', duration: 0 };
+      return { messageCount: 0, toolCount: 0, firstMessage: '', duration: 0, gitBranch: '', projectName: '' };
     }
   }
 

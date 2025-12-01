@@ -286,6 +286,19 @@
   letter-spacing: 0.05em;
 }
 
+.branch-badge {
+  font-size: 0.6rem;
+  font-weight: 500;
+  padding: 2px 6px;
+  background: var(--accent-purple, #a855f7);
+  color: white;
+  border-radius: 3px;
+  max-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .session-preview {
   font-size: 0.75rem;
   color: var(--text-secondary);

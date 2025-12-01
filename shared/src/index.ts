@@ -141,6 +141,7 @@ export interface SessionInfo {
   sessionId: string;
   filePath: string;
   projectPath: string;
+  projectName: string;  // Just the folder name (e.g., "Workflow Viewer")
   lastModified: string;
   // Enhanced metadata
   fileSize?: number;
@@ -149,6 +150,7 @@ export interface SessionInfo {
   firstMessage?: string;
   duration?: number;  // in milliseconds
   isLive?: boolean;   // modified within last 5 minutes
+  gitBranch?: string; // Git branch name
 }
 
 // Helper to check entry types
